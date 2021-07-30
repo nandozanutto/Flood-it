@@ -72,7 +72,7 @@ void GRAPHshow( Graph G) {
 }
 
 
-void insereAresta(Graph G, int numL, int numC){
+void lerArestas(Graph G, int numL, int numC){
 //loops separados para evitar dependência (otimização) 
     for(int i=1; i<numL-1; i++){
         for(int j=1; j<numC-1; j++){
@@ -129,6 +129,17 @@ void insereAresta(Graph G, int numL, int numC){
 
 }
 
+void copiaVizinhos(int o, int d, Graph G){
+
+    for(int i=0; i<G->V; i++){
+        G->adj[d][i] = G->adj[d][i] || G->adj[o][i];//copiando a vizinhança o para d
+        G->adj[i][d] = G->adj[i][d] || G->adj[i][o];//faz os vizinhos de o apontarem pra d 
+        G->adj[i][o] = 0;//zera os arcos para o
+        G->adj[o][i] = 0;//zero os arcos de o
+        G->adj[i][i] = 0;//exclui possível aresta pro mesmo nodo
+    }
+
+}
 
 int main(){
     Graph G;
@@ -147,25 +158,20 @@ int main(){
     }
 
     G = GRAPHinit(numL*numC);
-    insereAresta(G, numL, numC);
+    lerArestas(G, numL, numC);
 
-
+    printf("tam do grafo %d\n", G->V);
     for(int i=0; i<numL; i++){
         for(int j=0; j<numC; j++){
-            if(j>0 && matrix[i][j] == matrix[i][j-1])
-                printf("aqui\n");
-            if(i>0 && matrix[i][j] == matrix[i-1][j])
-                printf("aqui\n");
+            if(j>0 && matrix[i][j] == matrix[i][j-1])//vizinho da esquerda
+                copiaVizinhos(i*numC + j -1, i*numC+j, G);
+            if(i>0 && matrix[i][j] == matrix[i-1][j])//vizinho de cima
+                copiaVizinhos((i-1)*numC + j, i*numC+j, G);
         
         }
     }
 
-    for(int i=0; i<G->V; i++){
-        G->adj[1][i] = G->adj[1][i] || G->adj[0][i];
-        G->adj[i][1] = G->adj[i][1] || G->adj[i][0];
-        G->adj[i][0] = 0; 
-        G->adj[0][i] = 0; 
-    }
+
     GRAPHshow(G);
     return 0;
 }
