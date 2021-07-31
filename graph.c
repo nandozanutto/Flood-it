@@ -181,17 +181,27 @@ int main(){
 
     G = GRAPHinit(numL*numC);
     lerArestas(G, numL, numC);
+    GRAPHshow(G);
+
 
     printf("tam do grafo %d\n", G->V);
     for(int i=0; i<numL; i++){
         for(int j=0; j<numC; j++){
             G->adj[i*numC+j][G->V] = matrix[i][j];//salvando cor do vertice
             G->adj[i*numC+j][G->V+1] = 0;//ainda nao foi excluido
-            if(j>0 && matrix[i][j] == matrix[i][j-1])//vizinho da esquerda
-                copiaVizinhos(i*numC + j -1, i*numC+j, G);
-            if(i>0 && matrix[i][j] == matrix[i-1][j])//vizinho de cima
-                copiaVizinhos((i-1)*numC + j, i*numC+j, G);
+            // if(j>0 && matrix[i][j] == matrix[i][j-1])//vizinho da esquerda
+            //     copiaVizinhos(i*numC + j -1, i*numC+j, G);
+            // if(i>0 && matrix[i][j] == matrix[i-1][j])//vizinho de cima
+            //     copiaVizinhos((i-1)*numC + j, i*numC+j, G);
         
+        }
+    }
+
+    for(int i=0; i<G->V; i++){
+        for(int vizinho=0; vizinho<i; vizinho++){//checa aqueles que vieram antes
+            if(G->adj[i][vizinho] && G->adj[i][G->V] == G->adj[vizinho][G->V]){//se é vizinho e tem mesma cor
+                copiaVizinhos(vizinho, i, G);
+            }
         }
     }
 
@@ -214,13 +224,13 @@ int main(){
     int numPaint=0;
     int corPaint;
     GRAPHshow(G);
-    // scanf("%d", &numPaint);
-    // for(int i=0; i<numPaint; i++){
-    //     GRAPHshow(G);
-    //     scanf("%d", &corPaint);
-    //     pintaVertice(G, G->raiz, corPaint);
-    //     printf("raiz eh %d\n", G->raiz);
-    // }
+    scanf("%d", &numPaint);
+    for(int i=0; i<numPaint; i++){
+        GRAPHshow(G);
+        scanf("%d", &corPaint);
+        pintaVertice(G, G->raiz, corPaint);
+        printf("raiz eh %d\n", G->raiz);
+    }
 
 
 
