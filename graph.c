@@ -173,15 +173,15 @@ int main(){
         for(int j=0; j<numC; j++)
             scanf("%d", &matrix[i][j]);
 
-    for(int i=0; i<numL; i++){
-        for(int j=0; j<numC; j++)
-            printf("%d ", matrix[i][j]);
-        printf("\n");
-    }
+    // for(int i=0; i<numL; i++){
+    //     for(int j=0; j<numC; j++)
+    //         printf("%d ", matrix[i][j]);
+    //     printf("\n");
+    // }
 
     G = GRAPHinit(numL*numC);
     lerArestas(G, numL, numC);
-    GRAPHshow(G);
+    // GRAPHshow(G);
 
 
     printf("tam do grafo %d\n", G->V);
@@ -223,22 +223,20 @@ int main(){
 
     int numPaint=0;
     int corPaint;
-    GRAPHshow(G);
+    // GRAPHshow(G);
     scanf("%d", &numPaint);
     for(int i=0; i<numPaint; i++){
-        GRAPHshow(G);
+        // GRAPHshow(G);
         scanf("%d", &corPaint);
         pintaVertice(G, G->raiz, corPaint);
-        printf("raiz eh %d\n", G->raiz);
+        // printf("raiz eh %d\n", G->raiz);
     }
 
 
 
 
-    GRAPHshow(G);
-    printf("excluidos %d\n", G->numExcluidos);
-    // 3 1 3 2 1 3 2 1 3 2 1 
+    // GRAPHshow(G);
+    printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
 
-    // percorreVertices(G);
     return 0;
 }
