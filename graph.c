@@ -9,7 +9,9 @@ typedef struct vertex *ApontaVertex;
 struct graph {
    int V; 
    int A; 
-   int **adj; 
+   int **adj;
+   int raiz;
+   int numExcluidos; 
 };
 
 
@@ -33,7 +35,9 @@ Graph GRAPHinit( int V) {
    Graph G = malloc( sizeof *G);
    G->V = V; 
    G->A = 0;
-   G->adj = MATRIXint( V, V, 0);
+   G->raiz = 0;
+   G->adj = MATRIXint( V, V+2, 0);
+   G->numExcluidos = 0;
    return G;
 }
 
@@ -63,7 +67,7 @@ void GRAPHshow( Graph G) {
     }
 
    for (int v = 0; v < G->V; ++v) {
-      printf( "%2d:", v);
+      printf( "%2d(color %d excluido %d): ", v, G->adj[v][G->V], G->adj[v][G->V+1]);
       for (int w = 0; w < G->V; ++w)
          if (G->adj[v][w] == 1) 
             printf( " %2d", w);
@@ -130,7 +134,9 @@ void lerArestas(Graph G, int numL, int numC){
 }
 
 void copiaVizinhos(int o, int d, Graph G){
-
+    if(G->adj[o][G->V+1]) return;//o já foi removido!!!!
+    if(o == G->raiz)//raiz foi removida por d
+        G->raiz = d;
     for(int i=0; i<G->V; i++){
         G->adj[d][i] = G->adj[d][i] || G->adj[o][i];//copiando a vizinhança o para d
         G->adj[i][d] = G->adj[i][d] || G->adj[i][o];//faz os vizinhos de o apontarem pra d 
@@ -138,7 +144,23 @@ void copiaVizinhos(int o, int d, Graph G){
         G->adj[o][i] = 0;//zero os arcos de o
         G->adj[i][i] = 0;//exclui possível aresta pro mesmo nodo
     }
+    G->adj[o][G->V+1] = 1;//mata vertice
+    G->numExcluidos++;
 
+}
+
+
+
+void pintaVertice(Graph G, int v, int cor){
+    if(v != G->raiz)//só pode pintar a raiz
+        return;
+    G->adj[v][G->V] = cor;
+    //necessário checar se ao mudar de cor o vértice junta com algum vizinho
+    for(int i=0; i<G->V; i++){
+        if(i != v && G->adj[v][i] && G->adj[i][G->V] == cor){//se é vizinho de v e tem a mesma cor
+            copiaVizinhos(i, v, G);//mato vizinho
+        }
+    }
 }
 
 int main(){
@@ -163,6 +185,8 @@ int main(){
     printf("tam do grafo %d\n", G->V);
     for(int i=0; i<numL; i++){
         for(int j=0; j<numC; j++){
+            G->adj[i*numC+j][G->V] = matrix[i][j];//salvando cor do vertice
+            G->adj[i*numC+j][G->V+1] = 0;//ainda nao foi excluido
             if(j>0 && matrix[i][j] == matrix[i][j-1])//vizinho da esquerda
                 copiaVizinhos(i*numC + j -1, i*numC+j, G);
             if(i>0 && matrix[i][j] == matrix[i-1][j])//vizinho de cima
@@ -172,6 +196,39 @@ int main(){
     }
 
 
+    // GRAPHshow(G);
+    // pintaVertice(G, G->raiz, 3);
+    // pintaVertice(G, G->raiz, 1);
+    // pintaVertice(G, G->raiz, 3);
+    // pintaVertice(G, G->raiz, 2);
+    // pintaVertice(G, G->raiz, 1);
+    // printf("raiz eh %d\n", G->raiz);
+    // pintaVertice(G, G->raiz, 3);
+    // pintaVertice(G, G->raiz, 2);
+    // pintaVertice(G, G->raiz, 1);
+    // pintaVertice(G, G->raiz, 3);
+    // pintaVertice(G, G->raiz, 2);
+    // pintaVertice(G, G->raiz, 1);
+    // printf("raiz eh %d\n", G->raiz);
+
+    int numPaint=0;
+    int corPaint;
     GRAPHshow(G);
+    // scanf("%d", &numPaint);
+    // for(int i=0; i<numPaint; i++){
+    //     GRAPHshow(G);
+    //     scanf("%d", &corPaint);
+    //     pintaVertice(G, G->raiz, corPaint);
+    //     printf("raiz eh %d\n", G->raiz);
+    // }
+
+
+
+
+    GRAPHshow(G);
+    printf("excluidos %d\n", G->numExcluidos);
+    // 3 1 3 2 1 3 2 1 3 2 1 
+
+    // percorreVertices(G);
     return 0;
 }
