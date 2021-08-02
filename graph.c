@@ -23,6 +23,7 @@ struct vertex{
 };
 
 struct mudanca{
+    int excluidos;
     int raizAntiga;
     int corDaRaizAntiga;
     ApontaNodo listaMudanca;
@@ -188,6 +189,7 @@ void copiaVizinhos2(int o, int d, Graph G, ApontaMudanca mudanca){
     if(o == G->raiz)//raiz foi removida por d
         G->raiz = d;
     for(int i=0; i<G->V; i++){
+        if(d == i) continue;
         int valorAntigo = G->adj[d][i];
         G->adj[d][i] = G->adj[d][i] || G->adj[o][i];//copiando a vizinhança o para d
         if(G->adj[d][i] != valorAntigo)//este valor mudou
@@ -232,6 +234,7 @@ void GRAPHshow2( Graph G) {
 
 void pintaVertice(Graph G, int v, int cor, ApontaMudanca mudanca){ 
     mudanca->raizAntiga = G->raiz;//salvando raiz
+    mudanca->excluidos = G->numExcluidos;
     if(v != G->raiz)//só pode pintar a raiz
         return;
     mudanca->corDaRaizAntiga = G->adj[v][G->V];//salvando a cor da raiz
@@ -251,6 +254,7 @@ void despinta(Graph G, ApontaMudanca mudanca){
     for(ApontaNodo aux=mudanca->listaMudanca; aux!=NULL; aux=aux->proximo){
         *aux->mudou = (*aux->mudou + 1)%2;//inverte valor 0 -> 1 1 -> 0 
     }
+    G->numExcluidos = mudanca->excluidos;//caso algum vertice tenha 'revivido'
 }
 
 int main(){
@@ -274,7 +278,7 @@ int main(){
     // GRAPHshow(G);
 
 
-    printf("tam do grafo %d\n", G->V);
+    // printf("tam do grafo %d\n", G->V);
     for(int i=0; i<numL; i++){
         for(int j=0; j<numC; j++){
             G->adj[i*numC+j][G->V] = matrix[i][j];//salvando cor do vertice
@@ -297,19 +301,7 @@ int main(){
 
 
     // GRAPHshow(G);
-    printf("raiz eh %d\n", G->raiz);
-    // pintaVertice(G, G->raiz, 3);
-    // pintaVertice(G, G->raiz, 1);
-    // pintaVertice(G, G->raiz, 3);
-    // pintaVertice(G, G->raiz, 2);
-    // pintaVertice(G, G->raiz, 1);
     // printf("raiz eh %d\n", G->raiz);
-    // pintaVertice(G, G->raiz, 3);
-    // pintaVertice(G, G->raiz, 2);
-    // pintaVertice(G, G->raiz, 1);
-    // pintaVertice(G, G->raiz, 3);
-    // pintaVertice(G, G->raiz, 2);
-    // pintaVertice(G, G->raiz, 1);
     // printf("raiz eh %d\n", G->raiz);
 
     ApontaMudanca mudanca = criaMudanca();
@@ -318,7 +310,7 @@ int main(){
     GRAPHshow(G);
     scanf("%d", &numPaint);
     for(int i=0; i<numPaint; i++){
-        GRAPHshow2(G);
+        // GRAPHshow2(G);
         scanf("%d", &corPaint);
         pintaVertice(G, G->raiz, corPaint, mudanca);
         // printf("raiz eh %d\n", G->raiz);
@@ -328,12 +320,15 @@ int main(){
 
     // printf("**********antes de pintar\n");
     // GRAPHshow2(G);
+    // printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
     // pintaVertice(G, G->raiz, 3, mudanca);
     // printf("**********depois de pintar\n");
     // GRAPHshow2(G);
+    // printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
     // despinta(G, mudanca);
     // printf("**********depois de DESpintar\n");
     // GRAPHshow2(G);
+
 
     // G->adj[G->V-1][G->V] = 4;
     // int * teste = G->adj[G->V-1] + G->V;
