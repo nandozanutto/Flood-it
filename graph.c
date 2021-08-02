@@ -305,17 +305,17 @@ int main(){
     // printf("raiz eh %d\n", G->raiz);
 
     ApontaMudanca mudanca = criaMudanca();
-    int numPaint=0;
-    int corPaint;
-    GRAPHshow(G);
-    scanf("%d", &numPaint);
-    for(int i=0; i<numPaint; i++){
-        // GRAPHshow2(G);
-        scanf("%d", &corPaint);
-        pintaVertice(G, G->raiz, corPaint, mudanca);
-        // printf("raiz eh %d\n", G->raiz);
-        printf("******************\n");
-    }
+    // int numPaint=0;
+    // int corPaint;
+    // GRAPHshow(G);
+    // scanf("%d", &numPaint);
+    // for(int i=0; i<numPaint; i++){
+    //     // GRAPHshow2(G);
+    //     scanf("%d", &corPaint);
+    //     pintaVertice(G, G->raiz, corPaint, mudanca);
+    //     // printf("raiz eh %d\n", G->raiz);
+    //     printf("******************\n");
+    // }
 
 
     // printf("**********antes de pintar\n");
@@ -333,6 +333,13 @@ int main(){
     // G->adj[G->V-1][G->V] = 4;
     // int * teste = G->adj[G->V-1] + G->V;
     // *teste = 6;
+    int cor = 0;
+    while(G->numExcluidos != 24){
+        printf("pintei %d de %d\n", G->raiz, cor);
+        pintaVertice(G, G->raiz, cor, mudanca);
+        cor = (cor + 1)%4;
+    }
+
 
     GRAPHshow2(G);
     printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
