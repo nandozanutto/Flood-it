@@ -35,6 +35,11 @@ struct nodo{
     ApontaNodo proximo;
 };
 
+typedef struct reg { //fila
+   int         conteudo; 
+   struct reg *prox;
+} celula;
+
 /* REPRESENTAÇÃO POR MATRIZ DE ADJACÊNCIAS: A função GRAPHinit() constrói um grafo com vértices 0 1 .. V-1 e nenhum arco. */
 static int **MATRIXint( int r, int c, int val) { 
    int **m = malloc( r * sizeof (int *));
@@ -51,7 +56,7 @@ Graph GRAPHinit( int V) {
    G->V = V; 
    G->A = 0;
    G->raiz = 0;
-   G->adj = MATRIXint( V, V+2, 0);
+   G->adj = MATRIXint( V, V+4, 0);
    G->numExcluidos = 0;
    return G;
 }
@@ -257,6 +262,98 @@ void despinta(Graph G, ApontaMudanca mudanca){
     G->numExcluidos = mudanca->excluidos;//caso algum vertice tenha 'revivido'
 }
 
+// A structure to represent a queue
+struct Queue {
+    int front, rear, size;
+    unsigned capacity;
+    int* array;
+};
+
+
+struct Queue* createQueue(unsigned capacity)
+{
+    struct Queue* queue = (struct Queue*)malloc(
+        sizeof(struct Queue));
+    queue->capacity = capacity;
+    queue->front = queue->size = 0;
+  
+    // This is important, see the enqueue
+    queue->rear = capacity - 1;
+    queue->array = (int*)malloc(
+        queue->capacity * sizeof(int));
+    return queue;
+}
+  
+// Queue is full when size becomes
+// equal to the capacity
+int isFull(struct Queue* queue)
+{
+    return (queue->size == queue->capacity);
+}
+  
+// Queue is empty when size is 0
+int isEmpty(struct Queue* queue)
+{
+    return (queue->size == 0);
+}
+  
+// Function to add an item to the queue.
+// It changes rear and size
+void enqueue(struct Queue* queue, int item)
+{
+    if (isFull(queue))
+        return;
+    queue->rear = (queue->rear + 1)
+                  % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size = queue->size + 1;
+    // printf("%d enqueued to queue\n", item);
+}
+int dequeue(struct Queue* queue)
+{
+    if (isEmpty(queue))
+        return -1;
+    int item = queue->array[queue->front];
+    queue->front = (queue->front + 1)
+                   % queue->capacity;
+    queue->size = queue->size - 1;
+    return item;
+}
+  
+// G->adj[G->raiz][G->V+2]: distancia
+// G->adj[G->raiz][G->V+3]: estado
+int caminhosMinimos(Graph G){
+    for(int i=0; i<G->V; i++){
+        G->adj[i][G->V+2] = 0;
+        G->adj[i][G->V+3] = 0;
+    }
+
+    int biggestDistance = 0;
+    struct Queue * fila = createQueue(100);
+    G->adj[G->raiz][G->V+2] = 0;//distancia pra raiz igual a zero
+    enqueue(fila, G->raiz);
+    G->adj[G->raiz][G->V+3] = 1;//estado da raiz = 1
+
+    while(!isEmpty(fila)){//enquanto a fila não está vazia
+        int v = dequeue(fila);
+        for (int w = 0; w < G->V; ++w){
+            if(w==v) continue;
+            if (G->adj[v][w] == 1 && !G->adj[w][G->V+1]){//se é vizinho E w tá vivo 
+                if(!G->adj[w][G->V+3]){
+                    G->adj[w][G->V+2] = G->adj[v][G->V+2] + 1;
+                    if(G->adj[w][G->V+2]>biggestDistance)biggestDistance = G->adj[w][G->V+2];
+                    enqueue(fila, w);
+                    G->adj[w][G->V+3] = 1;
+                }
+            }
+        }
+        G->adj[v][G->V+3] = 2;
+    }
+
+    return biggestDistance;
+}
+
+
 int main(){
     Graph G;
 
@@ -304,18 +401,24 @@ int main(){
     // printf("raiz eh %d\n", G->raiz);
     // printf("raiz eh %d\n", G->raiz);
 
+
+
     ApontaMudanca mudanca = criaMudanca();
-    // int numPaint=0;
-    // int corPaint;
+    int numPaint=0;
+    int corPaint;
     // GRAPHshow(G);
-    // scanf("%d", &numPaint);
-    // for(int i=0; i<numPaint; i++){
-    //     // GRAPHshow2(G);
-    //     scanf("%d", &corPaint);
-    //     pintaVertice(G, G->raiz, corPaint, mudanca);
-    //     // printf("raiz eh %d\n", G->raiz);
-    //     printf("******************\n");
-    // }
+    scanf("%d", &numPaint);
+    for(int i=0; i<numPaint; i++){
+        // GRAPHshow2(G);
+        scanf("%d", &corPaint);
+        printf("raiz eh %d\n", G->raiz);
+        printf("maior distancia: %d\n",caminhosMinimos(G));
+        // for(int i=0; i<G->V; i++)
+        //     printf("vertice %d distancia %d estado %d\n", i, G->adj[i][G->V+2], G->adj[i][G->V+3]);
+        pintaVertice(G, G->raiz, corPaint, mudanca);
+        printf("******************\n");
+    }
+    printf("maior distancia: %d\n",caminhosMinimos(G));
 
 
     // printf("**********antes de pintar\n");
@@ -330,20 +433,27 @@ int main(){
     // GRAPHshow2(G);
 
 
-    // G->adj[G->V-1][G->V] = 4;
-    // int * teste = G->adj[G->V-1] + G->V;
-    // *teste = 6;
-    int cor = 0;
-    while(G->numExcluidos != 24){
-        printf("pintei %d de %d\n", G->raiz, cor);
-        pintaVertice(G, G->raiz, cor, mudanca);
-        cor = (cor + 1)%4;
-    }
+
+    // int cor = 0;
+    // while(G->numExcluidos != 24){
+    //     printf("pintei %d de %d\n", G->raiz, cor);
+    //     pintaVertice(G, G->raiz, cor, mudanca);
+    //     cor = (cor + 1)%4;
+    // }//força bruta
 
 
-    GRAPHshow2(G);
+    // GRAPHshow2(G);
     printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
 
+
+
+    // printf("maior distancia: %d\n",caminhosMinimos(G));
+
+
+
+    // celula *fila;
+    // fila = criafila();
+    // printf("%d", fila->prox==fila);
 
 
     return 0;
