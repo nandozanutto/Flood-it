@@ -238,11 +238,11 @@ void GRAPHshow2( Graph G) {
 }
 
 void pintaVertice(Graph G, int v, int cor, ApontaMudanca mudanca){ 
-    mudanca->raizAntiga = G->raiz;//salvando raiz
-    mudanca->excluidos = G->numExcluidos;
     if(v != G->raiz)//só pode pintar a raiz
         return;
-    mudanca->corDaRaizAntiga = G->adj[v][G->V];//salvando a cor da raiz
+    mudanca->raizAntiga = G->raiz;//salvando raiz
+    mudanca->excluidos = G->numExcluidos;
+    mudanca->corDaRaizAntiga = G->adj[G->raiz][G->V];//salvando a cor da raiz
     G->adj[v][G->V] = cor;
     //necessário checar se ao mudar de cor o vértice junta com algum vizinho
     for(int i=0; i<G->V; i++){
@@ -398,27 +398,50 @@ int main(){
 
 
     // GRAPHshow(G);
-    // printf("raiz eh %d\n", G->raiz);
-    // printf("raiz eh %d\n", G->raiz);
+    ApontaMudanca aux = criaMudanca();
+    while(G->numExcluidos != G->V-1){
+        // printf("excluidos original %d\n", G->numExcluidos);
 
+        int corOriginal = G->adj[G->raiz][G->V];
+        int corOtima = 0;
+        int biggestExcluidos = 0;
+        for(int i=1; i<numColor+1; i++){
+            if(i==corOriginal) continue;
+            ApontaMudanca mudanca = criaMudanca();
+            pintaVertice(G, G->raiz, i, mudanca);
+            // printf("cor %d excluidos %d\n", i, G->numExcluidos);
+            if(G->numExcluidos>biggestExcluidos){
+                biggestExcluidos=G->numExcluidos;
+                corOtima = i;
+            }
+            despinta(G, mudanca);
+        }
+        printf("corotima %d maior excluidos %d\n",corOtima, biggestExcluidos);
+        pintaVertice(G, G->raiz, corOtima, aux);
+    }
+
+    // printf("raiz eh %d\n", G->raiz);
+    // printf("raiz eh %d\n", G->raiz);
 
 
     ApontaMudanca mudanca = criaMudanca();
-    int numPaint=0;
-    int corPaint;
-    // GRAPHshow(G);
-    scanf("%d", &numPaint);
-    for(int i=0; i<numPaint; i++){
-        // GRAPHshow2(G);
-        scanf("%d", &corPaint);
-        printf("raiz eh %d\n", G->raiz);
-        printf("maior distancia: %d\n",caminhosMinimos(G));
-        // for(int i=0; i<G->V; i++)
-        //     printf("vertice %d distancia %d estado %d\n", i, G->adj[i][G->V+2], G->adj[i][G->V+3]);
-        pintaVertice(G, G->raiz, corPaint, mudanca);
-        printf("******************\n");
-    }
-    printf("maior distancia: %d\n",caminhosMinimos(G));
+
+    // int numPaint=0;
+    // int corPaint;
+    // // GRAPHshow(G);
+    // scanf("%d", &numPaint);
+    // for(int i=0; i<numPaint; i++){
+    //     printf("raiz eh %d\n", G->raiz);
+    //     // GRAPHshow2(G);
+    //     scanf("%d", &corPaint);
+    //     printf("raiz eh %d\n", G->raiz);
+    //     // printf("maior distancia: %d\n",caminhosMinimos(G));
+    //     // for(int i=0; i<G->V; i++)
+    //     //     printf("vertice %d distancia %d estado %d\n", i, G->adj[i][G->V+2], G->adj[i][G->V+3]);
+    //     pintaVertice(G, G->raiz, corPaint, mudanca);
+    //     printf("******************\n");
+    // }
+    // printf("maior distancia: %d\n",caminhosMinimos(G));
 
 
     // printf("**********antes de pintar\n");
@@ -432,18 +455,21 @@ int main(){
     // printf("**********depois de DESpintar\n");
     // GRAPHshow2(G);
 
+    // ApontaMudanca mudanca = criaMudanca();
 
 
     // int cor = 0;
-    // while(G->numExcluidos != 24){
+    // printf("num de vertices %d", G->V);
+    // while(G->numExcluidos != 99){
     //     printf("pintei %d de %d\n", G->raiz, cor);
     //     pintaVertice(G, G->raiz, cor, mudanca);
-    //     cor = (cor + 1)%4;
+    //     cor = (cor + 1)%6;
     // }//força bruta
 
 
+
     // GRAPHshow2(G);
-    printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
+    // printf("excluidos %d raiz %d\n", G->numExcluidos, G->raiz);
 
 
 
