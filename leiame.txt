@@ -1,0 +1,44 @@
+Com a matriz de cores dada no input é feito um grafo utilizando matriz de adjacência. Ou seja dado 
+uma entrada 5x4 a matriz de adjacência será 20x20. Escolhi matriz de adjacência pois o código 
+insere e remove arestas com muita frequência.
+
+Exemplo
+input:
+1 1 1 2 3 
+1 1 2 1 2 
+3 3 2 1 2 
+2 2 3 2 2 
+3 3 3 3 1 
+O elemento linha i coluna j da matriz de cores será o elemento i*numC + j da matriz de adjacência.
+Portanto o elemento 1 da matriz de adjacência terá aresta para os elementos 0 2 6.
+Após isso, o grafo é limpado, os vértices adjacentes da mesma cor são juntados em apenas 1 vértice da
+mesma cor. Isso é feito analisando os vértices que são vizinhos e que "vieram antes" na matriz de cores
+No mesmo exemplo:
+elemento 1 absorve 0
+elemento 2 absorve 1
+elemento 5 absorve 2
+elemento 6 absorve 5
+
+Como dois vértices juntam?
+Dados os vértices origem (aquele que será absorvido) e destino (aquele que irá absorver), os vizinhos 
+de origem são inseridos na vizinhança de destino. E todos os vertices que apontavam para origem agora 
+apontam para destino.
+Observe que neste processo a raiz (que inicialmente é o elemento 0) pode ser absorvido por outro nodo 
+da mesma cor, isso explica porque em algumas execuções o algoritmo pinta a partir de outro elemento
+diferente de zero. 
+
+Como pinta e despinta a raiz?
+Muda-se a cor da raiz e verifica-se a vizinhança à procura de um vértice da mesma cor, caso encontrado
+a raiz o absorve. Para depois poder despintar, são salvos ponteiros para as posições da matriz de 
+adjacência em que houve alteração (de zero para um ou vice-versa), posteriormente para voltar ao estado
+anterior é feito o comando *ponteiro = (*ponteiro + 1)%2
+
+Estratégia pensada vs estratégia implementada
+O algoritmo foi pensando para uso de A*. A heurística seria a distância pro nodo mais distante da raiz, 
+onde nodo é um bloco de cores adjacentes. A heurística é admissível e portanto daria soluções ótimas.
+Porém ao implementar (em caminhosMinimos.c) a heurística de maior distância notei que para tabuleiros
+muito grandes o tempo de execução é muito maior do que a limitação de tempo proposta. Então decidi 
+implementar um algoritmo guloso, que a cada passo checa qual cor pintada gera o maior número de 
+vértices excluídos (ou absorvidos) e então pinta a raiz com esta cor ótima.
+
+Fernando Zanutto
